@@ -35,3 +35,9 @@
 //     }
 //   }
 // }
+/**
+ * Custom command to open the portal
+ */
+Cypress.Commands.add('openHomePage', ()=> {
+    cy.visit('/')
+})

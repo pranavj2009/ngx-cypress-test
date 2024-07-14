@@ -140,20 +140,36 @@ describe('First suite test', () => {
     })
 
     it('Date picker', () =>{
+        function selectDayFromCurrent(numberOfDays)
+            {
+                let days = numberOfDays
+                let daysAfterDate = new Date()
+                daysAfterDate.setDate(daysAfterDate.getDate()+days)
+                let inputDate = daysAfterDate.getDate()
+                let inputMonth = daysAfterDate.toLocaleDateString('en-US',{month: 'short'});
+                let inputYear = daysAfterDate.getFullYear()
+                let dateToAssert = `${inputMonth} ${inputDate}, ${inputYear}`
+                console.log('Date to assert: '+dateToAssert)
+                cy.get('nb-calendar-navigation').invoke('attr', 'ng-reflect-date').then(dateAttr => {
+                    if(!dateAttr.includes(inputMonth) || !dateAttr.includes(inputYear)){
+                        cy.get('[data-name="chevron-right"]').click()
+                        selectDayFromCurrent(numberOfDays)
+                    }else{
+                        cy.get('.day-cell').not('.bounding-month').contains(inputDate).click()
+                    }
+                })
+                return dateToAssert
+        }
+
         cy.visit('/')
         cy.contains('Forms').click()
         cy.contains('Datepicker').click()
 
         cy.get('input[placeholder="Form Picker"').click()
-        let fiveDaysAfter = new Date();
-        fiveDaysAfter.setDate(fiveDaysAfter.getDate()+5)
-        let inputDate = fiveDaysAfter.getDate()
-        let dateToAssert = 'Jul '+inputDate+', 2024'
-        
         cy.contains('nb-card', 'Common Datepicker').find('input').then(dateInput => {
-            cy.wrap(dateInput).click()
-            cy.get('.day-cell').not('.bounding-month').contains(inputDate).click()
-            cy.wrap(dateInput).invoke('prop','value').should('contain', dateToAssert)
+        cy.wrap(dateInput).click()
+        const dateToAssert = selectDayFromCurrent(60)
+        cy.wrap(dateInput).invoke('prop','value').should('contain', dateToAssert)
         })
     })
 
@@ -238,7 +254,7 @@ describe('First suite test', () => {
         cy.get('nb-tooltip').should('contain', 'This is a tooltip')
     })
 
-    it.only('Dialog box', () => {
+    it('Dialog box', () => {
         cy.visit('/')
         cy.contains('Tables & Data').click()
         cy.contains('Smart Table').click()
