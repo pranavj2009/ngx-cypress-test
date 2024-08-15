@@ -12,4 +12,12 @@ export default defineConfig({
       // implement node event listeners here
     },
   },
+  retries: {
+    runMode: 2,
+    openMode: 0
+  },
+  reporter: 'cypress-multi-reporters',
+  reporterOptions: {
+    configFile: 'reporter-config.json',
+  },
 });
